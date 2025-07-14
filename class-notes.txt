@@ -1,0 +1,180 @@
+Docker command
+when you run AMi it is called as a server , server is running instance of AMi
+
+docker ps - will get running instances
+
+docker images - displays local imkages
+
+docker pull <image-name>:<tag/version> ---> get the image
+docker pull nginx:9 - pullit from docker hub 
+docker pull nginx
+
+docker create nginx - from nginx image -create container
+
+docker ps -a - all containers including all status
+docker start <container-ID>
+
+docker rm <container-ID> - remove container
+docker rm -f <container-ID> - forcely remove
+
+docker rmi <image-name or id>  - it will removes the image
+
+
+docker run nginx - docker run pull the image,run the container,start the container
+docker run <image>:<tag> -> docker run pull the image + run the container + start the container - it will run foreground
+docker run -d nginx - it will run background  -d detach mode
+
+0-65,535 -> container is like a mini server 0-65,535 ports are available .
+nginx port number listen on -port  80 - container port
+requset will come to host port
+
+docker run -d -p [host-port]80:80[container-port]
+http://<ip-address>  - check in browser
+
+host-port should be unique : we cannot use already used port while creating a container
+cannot reuse already used host-port.
+
+docker ps -a -q - list out all the container ids
+docker rm -f `docker ps -a -q` - remove all the containers at a time
+
+docker run -d -p 80:80 -name nginx nginx - name should be unique we canot reuse again
+
+docker exec -it <contailer-name/contailer-ID>
+docker exec -it nginx bash - contailer login command
+
+cat /etc/nginx/nginx.conf
+
+docker inspect <contailer-name/contailer-ID>
+docker inspect nginx - we can get contailer-information
+
+docker logs <contailer-name/contailer-ID> to check logs
+docker logs nginx
+
+
+How can you create cusotm images to your application
+
+Dockerfile ---> a set of instrucionts to create cusotmised images
+
+
+https://docs.docker.com/reference/dockerfile/  - Docker reference 	
+
+
+Dockerfile - Instrucitons
+
+FROM
+=====
+ FROM is the first instrucionts of the Dockerfile
+FROM almalinux:9     = almalinux which is equivalent -> rhel
+
+without verion it will take latest
+
+How to BUILD
+------
+
+docker build -t <image-name:version> . -> -t means - tag
+
+[ docker build -t from:v1 . ] --> [. means current dir] has Dockerfile
+docker build -t from:v1 dockerfile-path
+
+docker images - to check/list out the images
+
+
+RUN 
+===============
+on base images we can install required  packages/ configurations 
+RUN executes at time of image creation
+
+RUN dnf install nginx-y
+
+How to BUILD
+------
+
+docker build -t run:v1 .  - 
+
+CMD
+=============
+CMD executes at the time of container creation i.e at the time of docker run. 
+there should be only one CMD instruction inside Dockerfile
+
+in contaners there is no kernel 
+
+system start nginx --> /etc/systemd/syste/nginx.service
+
+nginx run container command
+["nginx" "-g" deamon off;"] - it will run nginx continuosly
+-g - means set global congiration directives
+
+INTERVIEW - diffrence between RUN vs CMD
+
+FROM run:v1
+CMD ["nginx" ,"-g", deamon off;"] run in foreground
+
+cmd should only one cmd instruciont inside dockerfile-path
+if we give many CMD instructions it will take last CMD instruction
+
+COPY
+=========
+copies the code from local to container
+
+RUN rm -rf  /usr/share/nginx/html/index.html #it will alredy index.html
+COPY index.html /usr/share/nginx/html/index.html
+
+[ docker build -t copy:v1 . ]
+docker run -d -p 80:80 --name copy copy:v1
+dcoker ps
+
+ADD
+=========
+COPY and ADD both copies the code from local to container. 
+But ADD command has two more advantages
+
+1. it can directly fetch the file from internet
+2. it can directly untar the file into the  container
+
+docker exec -it bash - login to <imagename_/container-ID> container
+
+
+docker rm add  # previous one removing
+docker build -t add:v1
+docker run -d -p 80:80 --name add add:v1
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
