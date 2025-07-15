@@ -1,9 +1,15 @@
 
 resource "aws_instance" "docker" {
-  ami           = "ami-09c813fb71547fc4f"
+  ami           = local.ami_id
   instance_type = "t3.micro"
   vpc_security_group_ids = local.sg_id
 
+# need more for terraform
+  root_block_device {
+    volume_size = 50
+    volume_type = "gp3" # or "gp2", depending on your preference
+  }
+  
   tags = merge(
     local.common_tags,{
         Name ="${var.project}-${var.environment}-DOCKER"
@@ -11,7 +17,7 @@ resource "aws_instance" "docker" {
   )
 }
 
-resource "aws_security_group" "allow_all" {
+resource "aws_security_group" "allow_all_docker" {
   name = "allow_all"
   description = "allow all traffic"
 
@@ -31,16 +37,16 @@ resource "aws_security_group" "allow_all" {
     ipv6_cidr_blocks = ["::/0"]
             }
 
-  # lifecycle {
-  #     create_before_destroy = true
-  #   }
+  lifecycle {
+      create_before_destroy = true
+    }
   tags = {
-    Name = "allow-all"
+    Name = "allow-all-docker"
         }
 
 }
 
-resource "terraform_data" "docker" {
+/* resource "terraform_data" "docker" {
   triggers_replace = [
     aws_instance.docker.id
   ]
@@ -65,4 +71,6 @@ resource "terraform_data" "docker" {
       
     ]
   }
-}
+} */
+
+D:\DevOps\Repos\dockerfiles\docker-instance\main.tf
