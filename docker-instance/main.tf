@@ -73,4 +73,4 @@ resource "aws_security_group" "allow_all_docker" {
   }
 } */
 
-D:\DevOps\Repos\dockerfiles\docker-instance\main.tf
+#D:\DevOps\Repos\dockerfiles\docker-instance\main.tf
