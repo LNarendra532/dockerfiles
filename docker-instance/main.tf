@@ -1,7 +1,7 @@
 
 resource "aws_instance" "docker" {
   ami           = local.ami_id
-  instance_type = "t3.micro"
+  instance_type = "t3.medium"
   vpc_security_group_ids = local.sg_id
 
 # need more for terraform
