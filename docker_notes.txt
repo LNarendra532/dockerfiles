@@ -172,13 +172,245 @@ While devloping images you can put some conditions while others are using your i
 ########################
 
 
+session 54
+
+docker network ls
+docker network create roboshop
+
+catalogue depends on mongodb 
+cart depends on catalogue
+
+docker -u login lvnaren532
+for i in catalogue mangodb mysql shipping user ; do cd $i;docker build -t lvnaren532/$i:v1 ; docker push lvnare532/$i:v1 cd ..;done
+
+#docker compose 
+ docker compose command line tool where you can we define  container as services.
+ TO manage mutli container application we can define all the containers as services, 
+ create dependencies between them , satrt them at once , stop them at once
+ 
+ 
+ 
+ Main Uses of Docker Compose:
+Define Multi-Container Applications
+
+You can define all your services (e.g., app, database, cache) in a single docker-compose.yml file.
+
+Example:
+
+yaml
+Copy
+Edit
+version: '3'
+services:
+  web:
+    image: myapp
+    ports:
+      - "8080:80"
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+Easier to Start/Stop All Services
+
+Single command to start everything:
 
 
+docker-compose up
+Single command to stop everything:
 
+docker-compose down
+Shared Network by Default
+
+All services in a docker-compose file are automatically 
+connected on the same network, making service-to-service communication easier.
+
+Example: Your web service can connect to db with hostname db.
+
+Environment Management
+
+You can set environment variables, volumes, networks easily inside the docker-compose.yml.
+
+Local Development & Testing environments
+
+Ideal for setting up development environments, CI/CD pipelines, 
+or testing environments without deploying to production.
+
+#####
+#########################
+
+
+Alll our continers  going to be services
+
+#static/ means copy including files and folders
+# static/* it will copy only files
+
+IMPOERTANT:
+# if we any changes in dockerfile - we have to rebuild  the image - if it is alredy created
+
+docker build -t  lvnaren532/frontend:v1 --no-cache .
+
+delteing schema.sql beacuse of the delting alredy existing one because of the order 
+we can tell this situation in insterview
+
+container are ephemeral - temporay by default containers
+if we remove them it remove the data
+
+###############55 SESSION ###############
+
+for i in $(ls -d */); do  cd $i ; name=$(basename "$i"); docker build -t lvnaren532/$name:v1 . ; dockerpush /lvnaren532/$name:v1 ; cd .. ; done
+
+
+for i in $(ls -d */); do
+
+    This loops over all directories (*/) in the current directory
+
+    Example: If you have folders: app1/, app2/, it will run the loop once for each
+
+cd $i
+
+    Enters the directory (e.g., cd app1)
+
+name=$(basename "$i")
+
+    Extracts just the folder name without trailing slash
+
+    Example: app1/ → app1
+
+docker build -t lvnaren532/$name:v1 .
+
+    Builds a Docker image from the Dockerfile in the current directory
+
+    Tags it as: lvnaren532/app1:v1 (for example)
+
+        lvnaren532: Docker Hub username
+
+        $name: the folder name
+
+        v1: image version
+
+dockerpush /lvnaren532/$name:v1
+
+    ❌ This is likely a typo
+
+    ✅ Should be:
+
+    docker push lvnaren532/$name:v1
+
+    Pushes the built Docker image to Docker Hub
+
+cd ..
+
+    Goes back to the parent directory and continues the loop
 
 
 
 	
+##########
+
+OPtimization 
+
+1.images sie is big
+	use minimal version
+	alpine version
+	
+imp : while doing optimizaion - After  reduce size of the image -user has to login  / should load the application / then it is success
+
+after reducing the image size above thisng should happen other wise it is a big mistake
+
+########
+
+-v host-dir:contaner-dir:
+/usr/share/nginx/html/  --> ngnx html dir
+if we delete container - host having the data 
+
+volumes 
+un-named volumes /unmanaged volumes 
+if we create dir and manage it then those un-named/un-named volumes
+if docker creates volumes adn manages them then they are named/manages volumes
+
+where data is important is called statefull application ..
+app code is stateless..
+end user data store place mysql.rabbitmq,redis etc.. statefull
+
+webtier config files , application code  stateless
+
+where we need to create volumes ---
+
+volumes should be created to statefull application . data bses store the actula data is host directories
+while rendering for users it will show tables or collections
+
+every datat-base store the data in ---- in some place/directroy in a server
+
+
+/my/own/datadir:/data/db -d mongo
+$ docker run --name some-mongo -v /my/own/datadir:/data/db -d mongo
+
+how to create named volumes
+docker volume create nginx
+docker volume ls 
+docker inspect nginx
+
+docker run -d -v nginx:/usr/share/nginx/html -p 80:80 nginx
+
+docker exec -it continer-id bash
+cd /usr/share/nginx/html/
+echo "hello html cainer volume" > helllo.html
+rm -rf contaner-id
+data will be available in nginx volumes
+
+docker compose up -d
+docker compose down - application will delete
+
+docker rmi `docker images -a -q` remove all images
+
+system user creation -run it as normal user
+
+RUN addgroup -S roboshop && adduser -S roboshop -G roboshop
+
+✅ Explanation:
+
+    addgroup -S roboshop:
+    Creates a system group named roboshop
+    -S means "system group" — meant for service/system users.
+
+    adduser -S roboshop -G roboshop:
+    Creates a system user named roboshop and assigns it to the group roboshop.
+
+ 
+
+	docker exec -it catalogue sh - is for alpine images
+- use minimal images
+-use official images
+-run it as non root containers
+-multi stage builds
+- optimize layers
+
+after running command - installing softwares we have some data - data is cached
+we have to remove using multi stage builds
+
+# multi stage builsds
+# we can use msb builds , multiple dockerfiles inside single docker files
+# we can use one as builder another one final image.we can copy files in builder image paste it to the final image 
+# we can save some space 
+
+-multi stage builds are like keeping Multiple Dockerfiles in a single Dockergile. one Dockerfile we can use it as builder,
+another Dockerfile we can use it as final image, we can copy what we want form builder to final image
+this reduce memeory and then unnecessary installations.
+
+optimize layers
+-------------------
+docker builds -t lvnaren532/catalogue:v1 --progress=plain --no-cache .
+
+DOCKER_BUILDKIT=0 docker build -t joindevops/user:v1 --progress=plain  .
+output will come
+
+frequently changing docker instrucitons we need to keep it to at the end docker-file 
+so that previous layers will not be disturbed
+
+Combine multiple RUN commands into a single instruction to 
+reduce the number of layers in the image
+
+
 
 
 
